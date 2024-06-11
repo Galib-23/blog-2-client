@@ -13,7 +13,7 @@ const Header = () => {
         to={"/"}
         className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white"
       >
-        <span className="px-2 py-1 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg text-white">
+        <span className="px-2 py-1 bg-gradient-to-r from-purple-400 to-blue-500 rounded-lg text-white">
           Galib&apos;s{" "}
         </span>{" "}
         Blog
@@ -34,7 +34,7 @@ const Header = () => {
           <FaMoon />
         </Button>
         <Link to='/sign-in'>
-            <Button gradientDuoTone='purpleToBlue'>
+            <Button gradientDuoTone='purpleToBlue' outline>
                 Sign In
             </Button>
         </Link>
