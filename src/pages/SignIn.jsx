@@ -3,6 +3,7 @@ import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from 'react-redux'
 import { SignInStart, signInFailure, signInSuccess } from "../redux/user/userSlice.js";
+import OAuth from "../components/OAuth.jsx";
 
 const SignIn = () => {
 
@@ -49,9 +50,10 @@ const SignIn = () => {
 
   return (
     <div className="min-h-screen mt-20">
-      <div className="flex p-3 max-w-5xl mx-auto flex-col md:flex-row md:items-center">
+      <div className="flex p-3 max-w-6xl mx-auto flex-col md:flex-row md:items-center gap-6 md:gap-16">
         {/* left section */}
-        <div className=" flex-1">
+        <div className="flex-1">
+          <div className="flex flex-col items-center sm:items-start gap-3 sm:gap-2">
           <Link
             to={"/"}
             className="whitespace-nowrap text-4xl font-bold dark:text-white"
@@ -61,11 +63,12 @@ const SignIn = () => {
             </span>{" "}
             Blog
           </Link>
-          <p className="text-sm mt-5">
+          <p className="text-sm mt-5 text-center sm:text-start">
             Hey there! I am Asadullah Al Galib. Welcome to my blog website. I
             upload my views on different topics and genres here regularly. Sign
             up for free and stay updated about myself.
           </p>
+          </div>
         </div>
 
         {/* right section */}
@@ -89,6 +92,8 @@ const SignIn = () => {
                 ) : "Sign In"
               }
             </Button>
+            <h2 className="text-lg font-semibold text-center">Or,</h2>
+            <OAuth />
           </form>
           <div className="flex gap-2 text-sm mt-5 justify-center">
             <span>Don&apos;t have an account?</span>
