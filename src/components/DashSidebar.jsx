@@ -21,7 +21,7 @@ const DashSidebar = () => {
       <Sidebar.Items>
         <Sidebar.ItemGroup>
           <Link to='/dashboard?tab=profile'>
-          <Sidebar.Item active={tab === 'profile'} className='cursor-pointer' icon={HiUser} label={"User"}>
+          <Sidebar.Item active={tab === 'profile'} className='cursor-pointer' icon={HiUser} label={"User"} as="div">
             Profile
           </Sidebar.Item>
           </Link>

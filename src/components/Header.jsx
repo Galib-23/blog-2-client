@@ -4,6 +4,8 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
+import { useState } from "react";
+import './Header.css'
 
 const Header = () => {
 
@@ -11,6 +13,13 @@ const Header = () => {
     const { currentUser } = useSelector((state) => state.user);
     const dispatch = useDispatch();
     const { theme } = useSelector(state => state.theme);
+    const [isSpinning, setIsSpinning] = useState(false);
+
+  const handleClick = () => {
+    setIsSpinning(true);
+    dispatch(toggleTheme());
+    setTimeout(() => setIsSpinning(false), 500);
+  };
 
   return (
     <Navbar className="border-b-2">
@@ -35,11 +44,16 @@ const Header = () => {
         <AiOutlineSearch />
       </Button>
       <div className="flex items-center gap-2 md:order-2">
-        <button onClick={() =>dispatch(toggleTheme())} className={`w-9 h-9 rounded-full hidden sm:flex sm:justify-center sm:items-center border hover:shadow-lg hover:scale-105 transition-scale duration-300 ${theme === 'dark' && 'hover:shadow-slate-500 hover:shadow-2xl hover:text-yellow-100'}`}>
-          {
-            theme === 'light' ? <FaSun /> : <FaMoon />
-          }
-        </button>
+      <button 
+      onClick={handleClick} 
+      className={`w-9 h-9 rounded-full hidden sm:flex sm:justify-center sm:items-center border hover:shadow-lg hover:scale-105 transition-scale duration-300 ${theme === 'dark' && 'hover:shadow-slate-500 hover:shadow-2xl'}`}
+    >
+      {
+        theme === 'light' 
+        ? <FaSun className={`text-yellow-400 ${isSpinning ? 'spin' : ''}`} /> 
+        : <FaMoon className={`${isSpinning ? 'spin' : ''}`} />
+      }
+    </button>
         {
           currentUser ? (
             <Dropdown arrowIcon={false} inline label={
