@@ -1,7 +1,10 @@
-import { TextInput } from "flowbite-react";
+import { Alert, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { MdModeEdit } from "react-icons/md";
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+
 import {
   getDownloadURL,
   getStorage,
@@ -35,6 +38,7 @@ const DashProfile = () => {
   }, [imageFile]);
 
   const uploadImage = async () => {
+    setUploadError(null);
     const storage = getStorage(app);
 
     //create a unique filename to avoid error
@@ -54,6 +58,9 @@ const DashProfile = () => {
       (error) => {
         console.log(error);
         setUploadError("Could not upload image. (File must be less then 2MB)");
+        setUploadProgress(null);
+        setImageFile(null);
+        setImageFileUrl(null);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
@@ -75,8 +82,31 @@ const DashProfile = () => {
           ref={filePickerRef}
         />
         <div className="self-center relative">
+          {
+            uploadProgress && (
+              <CircularProgressbar 
+                value={uploadProgress || 0}
+                text={`${uploadProgress} %`}
+                strokeWidth={5}
+                styles={{
+                  root: {
+                    width: '128px',
+                    height: '128px',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                  },
+                  path: {
+                    stroke: `rgba(62, 152, 199, ${
+                      uploadProgress / 100
+                    })`
+                  }
+                }}
+              />
+            )
+          }
           <img
-            className="w-32 h-32 rounded-full object-cover border-4 border-[lightgray]"
+            className={`w-32 h-32 rounded-full object-cover border-4 border-[lightgray] ${uploadProgress && uploadProgress < 100 && 'opacity-60'}`}
             src={imageFileUrl || currentUser.profilePicture}
             alt=""
           />
@@ -87,6 +117,7 @@ const DashProfile = () => {
             <MdModeEdit className="dark:text-black" /> Edit
           </span>
         </div>
+        {uploadError && <Alert color="failure">{uploadError}</Alert>}
         <TextInput
           type="text"
           id="username"
