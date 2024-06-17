@@ -10,7 +10,8 @@ const SignIn = () => {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, errorMessage } = useSelector(state => state.user);
+  const { loading } = useSelector(state => state.user);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -22,9 +23,11 @@ const SignIn = () => {
   }
 
   const handleSubmit = async (e) => {
+    setErrorMessage(null);
     e.preventDefault();
     if(!formData.email || !formData.password){
-      return dispatch(signInFailure("Please fill out all the fields"));
+      dispatch(signInFailure("Please fill out all the fields"));
+      setErrorMessage("Please fill out all the fields")
     }
     try {
       dispatch(SignInStart());
@@ -38,10 +41,13 @@ const SignIn = () => {
 
       const data = await res.json();
       if (data.success === false) {
-        return dispatch(signInFailure(data.message));
+        dispatch(signInFailure(data.message));
+        setErrorMessage(data.message);
       }
-      dispatch(signInSuccess(data));
-      navigate('/');
+      if (res.ok) {
+        dispatch(signInSuccess(data));
+        navigate('/');
+      }
     } catch (error) {
       console.log(error)
       dispatch(signInFailure(error.message));

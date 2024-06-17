@@ -1,9 +1,12 @@
 import { Alert, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { MdModeEdit } from "react-icons/md";
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import { updateFailure, updateStart, updateSuccess } from '../redux/user/userSlice'
+import Swal from "sweetalert2"
+
 
 import {
   getDownloadURL,
@@ -19,23 +22,24 @@ const DashProfile = () => {
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [uploadError, setUploadError] = useState(null);
+  const [updateDisable, setUpdateDisable] = useState(true);
+  const [formData, setFormData] = useState({});
 
   const filePickerRef = useRef();
+  const dispatch = useDispatch();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-
-      //convert to URL (temporary)
-      setImageFileUrl(URL.createObjectURL(file));
     }
   };
+
   useEffect(() => {
     if (imageFile) {
-      uploadImage();
+      setUpdateDisable(false);
     }
-  }, [imageFile]);
+  }, [imageFile])
 
   const uploadImage = async () => {
     setUploadError(null);
@@ -65,15 +69,62 @@ const DashProfile = () => {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
           setImageFileUrl(downloadUrl);
+          setFormData({...formData, profilePicture: downloadUrl});
         });
       },
     );
   };
 
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.id]: e.target.value});
+    setUpdateDisable(false);
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(updateStart());
+      if (imageFile) {
+        await uploadImage();
+      }
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "PUT",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        dispatch(updateFailure(data.message));
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: data.message,
+          //footer: '<a href="#">Why do I have this issue?</a>'
+        });
+        setUpdateDisable(true)
+      }else{
+        dispatch(updateSuccess(data));
+        Swal.fire("User updated successfully");
+        setUpdateDisable(true)
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.message,
+        //footer: '<a href="#">Why do I have this issue?</a>'
+      });
+      dispatch(updateFailure(error.message));
+      setUpdateDisable(true)
+    }
+  }
+
+  
+
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="file"
           className="hidden"
@@ -82,31 +133,29 @@ const DashProfile = () => {
           ref={filePickerRef}
         />
         <div className="self-center relative">
-          {
-            uploadProgress && (
-              <CircularProgressbar 
-                value={uploadProgress || 0}
-                text={`${uploadProgress} %`}
-                strokeWidth={5}
-                styles={{
-                  root: {
-                    width: '128px',
-                    height: '128px',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                  },
-                  path: {
-                    stroke: `rgba(62, 152, 199, ${
-                      uploadProgress / 100
-                    })`
-                  }
-                }}
-              />
-            )
-          }
+          {uploadProgress && (
+            <CircularProgressbar
+              value={uploadProgress || 0}
+              text={`${uploadProgress} %`}
+              strokeWidth={5}
+              styles={{
+                root: {
+                  width: "128px",
+                  height: "128px",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                },
+                path: {
+                  stroke: `rgba(62, 152, 199, ${uploadProgress / 100})`,
+                },
+              }}
+            />
+          )}
           <img
-            className={`w-32 h-32 rounded-full object-cover border-4 border-[lightgray] ${uploadProgress && uploadProgress < 100 && 'opacity-60'}`}
+            className={`w-32 h-32 rounded-full object-cover border-4 border-[lightgray] ${
+              uploadProgress && uploadProgress < 100 && "opacity-60"
+            }`}
             src={imageFileUrl || currentUser.profilePicture}
             alt=""
           />
@@ -123,17 +172,29 @@ const DashProfile = () => {
           id="username"
           placeholder="username"
           defaultValue={currentUser.username}
+          onChange={handleChange}
         />
         <TextInput
           type="email"
           id="email"
+          disabled
           placeholder="email"
           defaultValue={currentUser.email}
         />
-        <TextInput type="password" id="password" placeholder="password" />
+        <TextInput 
+          type="password" 
+          id="password" 
+          placeholder="password"
+          onChange={handleChange}
+         />
         <button
+          disabled={updateDisable}
           type="submit"
-          className="bg-cyan-600 py-3 rounded-lg font-semibold text-white hover:bg-cyan-300 hover:text-black"
+          className={`${
+            !updateDisable
+              ? "bg-cyan-600 text-white hover:bg-cyan-300 hover:text-black"
+              : "bg-gray-500"
+          } py-3 rounded-lg font-semibold`}
         >
           Update
         </button>
