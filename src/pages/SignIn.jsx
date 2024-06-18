@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { SignInStart, signInFailure, signInSuccess } from "../redux/user/userSlice.js";
 import OAuth from "../components/OAuth.jsx";
 
@@ -10,7 +10,7 @@ const SignIn = () => {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading } = useSelector(state => state.user);
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleChange = (e) => {
@@ -30,6 +30,7 @@ const SignIn = () => {
       setErrorMessage("Please fill out all the fields")
     }
     try {
+      setLoading(true);
       dispatch(SignInStart());
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
@@ -43,13 +44,16 @@ const SignIn = () => {
       if (data.success === false) {
         dispatch(signInFailure(data.message));
         setErrorMessage(data.message);
+        setLoading(false);
       }
       if (res.ok) {
         dispatch(signInSuccess(data));
+        setLoading(false);
         navigate('/');
       }
     } catch (error) {
       console.log(error)
+      setLoading(false);
       dispatch(signInFailure(error.message));
     }
   }

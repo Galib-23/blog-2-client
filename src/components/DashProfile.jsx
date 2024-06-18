@@ -4,9 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { MdModeEdit } from "react-icons/md";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { updateFailure, updateStart, updateSuccess } from '../redux/user/userSlice'
-import Swal from "sweetalert2"
-
+import {
+  updateFailure,
+  updateStart,
+  updateSuccess,
+} from "../redux/user/userSlice";
+import Swal from "sweetalert2";
 
 import {
   getDownloadURL,
@@ -19,7 +22,7 @@ import { app } from "../firebase";
 const DashProfile = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
-  const [imageFileUrl, setImageFileUrl] = useState(null);
+  const [localImageFileUrl, setLocalImageFileUrl] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [uploadError, setUploadError] = useState(null);
   const [updateDisable, setUpdateDisable] = useState(true);
@@ -32,6 +35,7 @@ const DashProfile = () => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
+      setLocalImageFileUrl(URL.createObjectURL(file));
     }
   };
 
@@ -39,87 +43,90 @@ const DashProfile = () => {
     if (imageFile) {
       setUpdateDisable(false);
     }
-  }, [imageFile])
-
-  const uploadImage = async () => {
-    setUploadError(null);
-    const storage = getStorage(app);
-
-    //create a unique filename to avoid error
-    const fileName = new Date().getTime() + imageFile.name;
-
-    //create a ref of storage. this ref is from firebase/storage
-    const storageRef = ref(storage, fileName);
-
-    const uploadTask = uploadBytesResumable(storageRef, imageFile);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setUploadProgress(progress.toFixed(0));
-      },
-      (error) => {
-        console.log(error);
-        setUploadError("Could not upload image. (File must be less then 2MB)");
-        setUploadProgress(null);
-        setImageFile(null);
-        setImageFileUrl(null);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
-          setImageFileUrl(downloadUrl);
-          setFormData({...formData, profilePicture: downloadUrl});
-        });
-      },
-    );
-  };
+  }, [imageFile]);
 
   const handleChange = (e) => {
-    setFormData({...formData, [e.target.id]: e.target.value});
+    setFormData({ ...formData, [e.target.id]: e.target.value });
     setUpdateDisable(false);
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       dispatch(updateStart());
-      if (imageFile) {
-        await uploadImage();
+      let imageUrl = formData.profilePicture || currentUser.profilePicture || '';
+      if (localImageFileUrl) {
+        imageUrl = await uploadImage();
       }
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: "PUT",
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(formData)
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        dispatch(updateFailure(data.message));
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: data.message,
-          //footer: '<a href="#">Why do I have this issue?</a>'
+
+      const updatedData = { ...formData, profilePicture: imageUrl};
+
+        const res = await fetch(`/api/user/update/${currentUser._id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedData),
         });
-        setUpdateDisable(true)
-      }else{
-        dispatch(updateSuccess(data));
-        Swal.fire("User updated successfully");
-        setUpdateDisable(true)
-      }
+        const data = await res.json();
+        if (!res.ok) {
+          dispatch(updateFailure(data.message));
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: data.message,
+          });
+          setUpdateDisable(true);
+        } else {
+          dispatch(updateSuccess(data));
+          Swal.fire("User updated successfully");
+          setUploadProgress(null);
+          setUpdateDisable(true);
+        }
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: error.message,
-        //footer: '<a href="#">Why do I have this issue?</a>'
       });
       dispatch(updateFailure(error.message));
-      setUpdateDisable(true)
+      setUpdateDisable(true);
     }
-  }
+  };
 
-  
+  const uploadImage = () => {
+    return new Promise((resolve, reject) => {
+      setUploadError(null);
+      const storage = getStorage(app);
+
+      // Create a unique filename to avoid error
+      const fileName = new Date().getTime() + imageFile.name;
+
+      // Create a ref of storage. This ref is from firebase/storage
+      const storageRef = ref(storage, fileName);
+
+      const uploadTask = uploadBytesResumable(storageRef, imageFile);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress.toFixed(0));
+        },
+        (error) => {
+          console.log(error);
+          setUploadError("Could not upload image. (File must be less than 2MB)");
+          setUploadProgress(null);
+          setImageFile(null);
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
+            console.log("Image uploaded, download URL:", downloadUrl);
+            resolve(downloadUrl);
+          });
+        },
+      );
+    });
+  };
 
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
@@ -156,7 +163,7 @@ const DashProfile = () => {
             className={`w-32 h-32 rounded-full object-cover border-4 border-[lightgray] ${
               uploadProgress && uploadProgress < 100 && "opacity-60"
             }`}
-            src={imageFileUrl || currentUser.profilePicture}
+            src={localImageFileUrl || currentUser.profilePicture}
             alt=""
           />
           <span
@@ -181,12 +188,12 @@ const DashProfile = () => {
           placeholder="email"
           defaultValue={currentUser.email}
         />
-        <TextInput 
-          type="password" 
-          id="password" 
+        <TextInput
+          type="password"
+          id="password"
           placeholder="password"
           onChange={handleChange}
-         />
+        />
         <button
           disabled={updateDisable}
           type="submit"
