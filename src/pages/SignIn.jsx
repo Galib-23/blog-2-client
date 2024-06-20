@@ -1,12 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
-import { useDispatch } from 'react-redux'
-import { SignInStart, signInFailure, signInSuccess } from "../redux/user/userSlice.js";
+import { useDispatch } from "react-redux";
+import {
+  SignInStart,
+  signInFailure,
+  signInSuccess,
+} from "../redux/user/userSlice.js";
 import OAuth from "../components/OAuth.jsx";
 
 const SignIn = () => {
-
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -16,26 +19,25 @@ const SignIn = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.id]: e.target.value.trim()
-    })
+      [e.target.id]: e.target.value.trim(),
+    });
     console.log(formData);
-
-  }
+  };
 
   const handleSubmit = async (e) => {
     setErrorMessage(null);
     e.preventDefault();
-    if(!formData.email || !formData.password){
+    if (!formData.email || !formData.password) {
       dispatch(signInFailure("Please fill out all the fields"));
-      setErrorMessage("Please fill out all the fields")
+      setErrorMessage("Please fill out all the fields");
     }
     try {
       setLoading(true);
       dispatch(SignInStart());
-      const res = await fetch('/api/auth/signin', {
-        method: 'POST',
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -49,14 +51,14 @@ const SignIn = () => {
       if (res.ok) {
         dispatch(signInSuccess(data));
         setLoading(false);
-        navigate('/');
+        navigate("/");
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setLoading(false);
       dispatch(signInFailure(error.message));
     }
-  }
+  };
 
   return (
     <div className="min-h-screen mt-20">
@@ -64,20 +66,20 @@ const SignIn = () => {
         {/* left section */}
         <div className="flex-1">
           <div className="flex flex-col items-center sm:items-start gap-3 sm:gap-2">
-          <Link
-            to={"/"}
-            className="whitespace-nowrap text-4xl font-bold dark:text-white"
-          >
-            <span className="px-2 py-1 bg-gradient-to-r from-purple-400 to-blue-500 rounded-lg text-white">
-              Galib&apos;s{" "}
-            </span>{" "}
-            Blog
-          </Link>
-          <p className="text-sm mt-5 text-center sm:text-start">
-            Hey there! I am Asadullah Al Galib. Welcome to my blog website. I
-            upload my views on different topics and genres here regularly. Sign
-            up for free and stay updated about myself.
-          </p>
+            <Link
+              to={"/"}
+              className="whitespace-nowrap text-4xl font-bold dark:text-white"
+            >
+              <span className="px-2 py-1 bg-gradient-to-r from-purple-400 to-blue-500 rounded-lg text-white">
+                Galib&apos;s{" "}
+              </span>{" "}
+              Blog
+            </Link>
+            <p className="text-sm mt-5 text-center sm:text-start">
+              Hey there! I am Asadullah Al Galib. Welcome to my blog website. I
+              upload my views on different topics and genres here regularly.
+              Sign up for free and stay updated about myself.
+            </p>
           </div>
         </div>
 
@@ -86,37 +88,48 @@ const SignIn = () => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
               <Label value="Your email" />
-              <TextInput type="email" placeholder="Email" id="email" onChange={handleChange} />
+              <TextInput
+                type="email"
+                placeholder="Email"
+                id="email"
+                onChange={handleChange}
+              />
             </div>
             <div>
               <Label value="Your password" />
-              <TextInput type="password" placeholder="Password" id="password" onChange={handleChange} />
+              <TextInput
+                type="password"
+                placeholder="Password"
+                id="password"
+                onChange={handleChange}
+              />
             </div>
             <Button gradientMonochrome="cyan" type="submit" disabled={loading}>
-              {
-                loading ? (
-                  <>
-                    <Spinner size='sm' />
-                    <span className="pl-3">Loading...</span>
-                  </>
-                ) : "Sign In"
-              }
+              {loading ? (
+                <>
+                  <Spinner size="sm" />
+                  <span className="pl-3">Loading...</span>
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
+          </form>
+          <div className="space-y-4 mt-4">
             <h2 className="text-lg font-semibold text-center">Or,</h2>
             <OAuth />
-          </form>
+          </div>
           <div className="flex gap-2 text-sm mt-5 justify-center">
             <span>Don&apos;t have an account?</span>
-            <Link to={'/sign-up'} className="text-blue-500 font-semibold">
-            Sign Up</Link>
+            <Link to={"/sign-up"} className="text-blue-500 font-semibold">
+              Sign Up
+            </Link>
           </div>
-          {
-            errorMessage && (
-              <Alert className="mt-5" color='failure'>
-                {errorMessage}
-              </Alert>
-            )
-          }
+          {errorMessage && (
+            <Alert className="mt-5" color="failure">
+              {errorMessage}
+            </Alert>
+          )}
         </div>
       </div>
     </div>
