@@ -1,11 +1,13 @@
 import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon, FaSun } from "react-icons/fa";
+import { FaMoon, FaSignOutAlt, FaSun } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { useState } from "react";
 import './Header.css'
+import Swal from "sweetalert2";
+import { signOutSuccess } from "../redux/user/userSlice";
 
 const Header = () => {
 
@@ -19,6 +21,45 @@ const Header = () => {
     setIsSpinning(true);
     dispatch(toggleTheme());
     setTimeout(() => setIsSpinning(false), 500);
+  };
+
+  const handleSignout = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sign Out"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+
+        try {
+          const res = await fetch('/api/user/signout', {
+            method: 'POST',
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            console.log(data.message);
+          }else{
+            dispatch(signOutSuccess());
+            Swal.fire({
+              title: "Signed Out",
+              text: "You have successfully logged out",
+              icon: "success"
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: error.message || "Something went wrong!",
+          });
+        }
+      }
+    });
   };
 
   return (
@@ -67,8 +108,8 @@ const Header = () => {
                 <Dropdown.Item>Profile</Dropdown.Item>
               </Link>
               <Dropdown.Divider />
-              <Dropdown.Item>
-                Sign Out
+              <Dropdown.Item className="text-red-500 flex items-center gap-2" onClick={handleSignout}>
+                Sign Out <FaSignOutAlt />
               </Dropdown.Item>
             </Dropdown>
           ) : (

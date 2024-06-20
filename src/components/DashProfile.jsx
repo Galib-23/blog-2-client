@@ -331,7 +331,7 @@ const DashProfile = () => {
           className={`${
             !updateDisable
               ? "bg-cyan-600 text-white hover:bg-cyan-300 hover:text-black"
-              : "bg-gray-500"
+              : "bg-gray-300 text-slate-600"
           } py-3 rounded-lg font-semibold`}
         >
           Update
