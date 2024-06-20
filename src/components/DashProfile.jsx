@@ -97,7 +97,10 @@ const DashProfile = () => {
     }
   };
 
-  const uploadImage = () => {
+  const uploadImage = async () => {
+    if (currentUser.profilePicture) {
+      await deleteImage(currentUser.profilePicture);
+    }
     return new Promise((resolve, reject) => {
       setUploadError(null);
       const storage = getStorage(app);
