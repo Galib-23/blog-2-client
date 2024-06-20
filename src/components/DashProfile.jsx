@@ -5,6 +5,9 @@ import { MdModeEdit } from "react-icons/md";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import {
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
   updateFailure,
   updateStart,
   updateSuccess,
@@ -12,6 +15,7 @@ import {
 import Swal from "sweetalert2";
 
 import {
+  deleteObject,
   getDownloadURL,
   getStorage,
   ref,
@@ -54,33 +58,34 @@ const DashProfile = () => {
     e.preventDefault();
     try {
       dispatch(updateStart());
-      let imageUrl = formData.profilePicture || currentUser.profilePicture || '';
+      let imageUrl =
+        formData.profilePicture || currentUser.profilePicture || "";
       if (localImageFileUrl) {
         imageUrl = await uploadImage();
       }
 
-      const updatedData = { ...formData, profilePicture: imageUrl};
+      const updatedData = { ...formData, profilePicture: imageUrl };
 
-        const res = await fetch(`/api/user/update/${currentUser._id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedData),
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        dispatch(updateFailure(data.message));
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: data.message,
         });
-        const data = await res.json();
-        if (!res.ok) {
-          dispatch(updateFailure(data.message));
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: data.message,
-          });
-          setUpdateDisable(true);
-        } else {
-          dispatch(updateSuccess(data));
-          Swal.fire("User updated successfully");
-          setUploadProgress(null);
-          setUpdateDisable(true);
-        }
+        setUpdateDisable(true);
+      } else {
+        dispatch(updateSuccess(data));
+        Swal.fire("User updated successfully");
+        setUploadProgress(null);
+        setUpdateDisable(true);
+      }
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -113,18 +118,101 @@ const DashProfile = () => {
         },
         (error) => {
           console.log(error);
-          setUploadError("Could not upload image. (File must be less than 2MB)");
+          setUploadError(
+            "Could not upload image. (File must be less than 2MB)",
+          );
           setUploadProgress(null);
           setImageFile(null);
           reject(error);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
-            console.log("Image uploaded, download URL:", downloadUrl);
             resolve(downloadUrl);
           });
         },
       );
+    });
+  };
+
+  const deleteImage = (imageUrl) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const storage = getStorage();
+        const imageRef = ref(storage, imageUrl);
+
+        getDownloadURL(imageRef)
+          .then(() => {
+            return deleteObject(imageRef);
+          })
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            if (error.code === "storage/object-not-found") {
+              console.log("Image not found");
+              resolve();
+            } else {
+              console.log("inside else: ", error);
+              reject(error);
+            }
+          });
+      } catch (error) {
+        console.log(error.code);
+        if (error.code === "storage/invalid-url") {
+          console.log("Image not found");
+          resolve();
+        }
+        reject(error);
+      }
+    });
+  };
+  const handleDeleteUser = async () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          dispatch(deleteUserStart());
+          console.log("disp start");
+          if (currentUser.profilePicture) {
+            console.log("going to call");
+            await deleteImage(currentUser.profilePicture);
+          }
+          console.log("after call");
+          const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+            method: "DELETE",
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            dispatch(deleteUserFailure(data.message));
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: data.message || "Something went wrong!",
+            });
+          } else {
+            dispatch(deleteUserSuccess());
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+          }
+        } catch (error) {
+          dispatch(deleteUserFailure(error.message));
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+          });
+        }
+      }
     });
   };
 
@@ -207,7 +295,10 @@ const DashProfile = () => {
         </button>
       </form>
       <div className="flex justify-between mt-4 text-red-600 font-semibold">
-        <span className="cursor-pointer hover:text-red-400">
+        <span
+          onClick={handleDeleteUser}
+          className="cursor-pointer hover:text-red-400"
+        >
           Delete Account
         </span>
         <span className="cursor-pointer hover:text-red-400">Sign Out</span>
