@@ -8,6 +8,7 @@ import {
   deleteUserFailure,
   deleteUserStart,
   deleteUserSuccess,
+  signOutSuccess,
   updateFailure,
   updateStart,
   updateSuccess,
@@ -219,6 +220,45 @@ const DashProfile = () => {
     });
   };
 
+  const handleSignout = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sign Out"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+
+        try {
+          const res = await fetch('/api/user/signout', {
+            method: 'POST',
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            console.log(data.message);
+          }else{
+            dispatch(signOutSuccess());
+            Swal.fire({
+              title: "Signed Out",
+              text: "You have successfully logged out",
+              icon: "success"
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: error.message || "Something went wrong!",
+          });
+        }
+      }
+    });
+  };
+
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
@@ -304,7 +344,12 @@ const DashProfile = () => {
         >
           Delete Account
         </span>
-        <span className="cursor-pointer hover:text-red-400">Sign Out</span>
+        <span
+          onClick={handleSignout}
+          className="cursor-pointer hover:text-red-400"
+        >
+          Sign Out
+        </span>
       </div>
     </div>
   );
