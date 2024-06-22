@@ -1,8 +1,9 @@
 import { Alert, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { MdModeEdit } from "react-icons/md";
+import { MdEdit, MdModeEdit } from "react-icons/md";
 import { CircularProgressbar } from "react-circular-progressbar";
+import { Link } from "react-router-dom";
 import "react-circular-progressbar/dist/styles.css";
 import {
   deleteUserFailure,
@@ -228,23 +229,22 @@ const DashProfile = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Sign Out"
+      confirmButtonText: "Sign Out",
     }).then(async (result) => {
       if (result.isConfirmed) {
-
         try {
-          const res = await fetch('/api/user/signout', {
-            method: 'POST',
+          const res = await fetch("/api/user/signout", {
+            method: "POST",
           });
           const data = await res.json();
           if (!res.ok) {
             console.log(data.message);
-          }else{
+          } else {
             dispatch(signOutSuccess());
             Swal.fire({
               title: "Signed Out",
               text: "You have successfully logged out",
-              icon: "success"
+              icon: "success",
             });
           }
         } catch (error) {
@@ -337,6 +337,13 @@ const DashProfile = () => {
           Update
         </button>
       </form>
+      {currentUser.isAdmin && (
+        <Link to='/create-post'>
+          <button className="bg-sky-400 text flex items-center justify-center py-2 mt-4 rounded-xl w-1/2">
+            Create a post <MdEdit />
+          </button>
+        </Link>
+      )}
       <div className="flex justify-between mt-4 text-red-600 font-semibold">
         <span
           onClick={handleDeleteUser}
