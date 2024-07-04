@@ -337,9 +337,9 @@ const DashProfile = () => {
           Update
         </button>
       </form>
-      {currentUser.isAdmin && (
+      {currentUser?.isAdmin && (
         <Link to='/create-post'>
-          <button className="bg-sky-400 text flex items-center justify-center py-2 mt-4 rounded-xl w-1/2">
+          <button className="bg-[#1d3f75] text-white flex items-center justify-center py-2 mt-4 rounded-xl w-1/2 hover:bg-[#2b5599] ">
             Create a post <MdEdit />
           </button>
         </Link>
