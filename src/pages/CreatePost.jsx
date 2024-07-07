@@ -3,6 +3,7 @@ import { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import {
+  deleteObject,
   getDownloadURL,
   getStorage,
   ref,
@@ -63,6 +64,39 @@ const CreatePost = () => {
     });
   };
 
+  const deleteImage = (imageUrl) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const storage = getStorage();
+        const imageRef = ref(storage, imageUrl);
+
+        getDownloadURL(imageRef)
+          .then(() => {
+            return deleteObject(imageRef);
+          })
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            if (error.code === "storage/object-not-found") {
+              console.log("Image not found");
+              resolve();
+            } else {
+              console.log("inside else: ", error);
+              reject(error);
+            }
+          });
+      } catch (error) {
+        console.log(error.code);
+        if (error.code === "storage/invalid-url") {
+          console.log("Image not found");
+          resolve();
+        }
+        reject(error);
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -81,6 +115,9 @@ const CreatePost = () => {
       });
       const data = await res.json();
       if (!res.ok) {
+        if (updatedData.image) {
+          await deleteImage(updatedData.image);
+        }
         setPublishError(data.message);
         return;
       }
@@ -90,7 +127,7 @@ const CreatePost = () => {
       }
       if (res.ok) {
         setPublishError(null);
-        navigate("/");
+        navigate(`/post/${data.slug}`);
         Swal.fire({
           title: "Post published!",
           text: "You have successfully created this post",
@@ -135,13 +172,6 @@ const CreatePost = () => {
             accept="image/*"
             onChange={handleImageChange}
           />
-          {/* <button type="button" className="py-2 px-3 bg-cyan-900 hover:bg-cyan-700 text-white rounded-md hover:shadow-md">Upload</button> */}
-          {imageUploadProgress &&
-            Swal.fire({
-              title: "Uploading...",
-              text: `${imageUploadProgress}%` ,
-              icon: "info",
-            })}
           {(formData.image || localImageFileUrl) && (
             <img
               src={formData.image || localImageFileUrl}
@@ -166,7 +196,9 @@ const CreatePost = () => {
           type="submit"
           className="py-2 px-3 bg-cyan-900 hover:bg-cyan-700 text-white rounded-md hover:shadow-md  self-center w-full sm:w-1/2"
         >
-          Publish
+          {
+            imageUploadProgress ? `Uploading...${imageUploadProgress}%` : 'Publish'
+          }
         </button>
         {publishError && (
           <Alert color="failure" className="mt-5">
