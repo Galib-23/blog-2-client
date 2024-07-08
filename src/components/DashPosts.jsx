@@ -2,11 +2,13 @@ import { Table } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const DashPosts = () => {
   const { currentUser } = useSelector((state) => state.user);
 
   const [userPosts, setUserPosts] = useState([]);
+  const [showMore, setShowMore] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -15,18 +17,75 @@ const DashPosts = () => {
         const data = await res.json();
         if (res.ok) {
           setUserPosts(data.posts);
+          if (data.post.length < 9) {
+            setShowMore(false);
+          }
         }
       } catch (error) {
         console.log(error.message);
       }
     };
-
     if (currentUser.isAdmin) {
       fetchPosts();
     }
   }, [currentUser._id]);
+
+  const handleShowMore = async () => {
+    const startIndex = userPosts.length;
+    try {
+      const res = await fetch(
+        `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`,
+      );
+      const data = await res.json();
+      setUserPosts((prev) => [...prev, ...data.posts]);
+      if (data.posts.length < 9) {
+        setShowMore(false);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleDeletePost = async (postId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch(
+            `/api/post/deletepost/${postId}/${currentUser._id}`,
+            {
+              method: 'DELETE',
+            }
+          );
+          const data = await res.json();
+          if (!res.ok) {
+            console.log(data.message);
+          } else {
+            setUserPosts((prev) =>
+              prev.filter((post) => post._id !== postId)
+            );
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success"
+            });
+          }
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
+    });
+  };
+
   return (
-    <div className='table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500'>
+    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
       {currentUser.isAdmin && userPosts.length > 0 ? (
         <>
           <Table hoverable className="shadow-md">
@@ -66,8 +125,7 @@ const DashPosts = () => {
                   <Table.Cell>{post.category}</Table.Cell>
                   <Table.Cell>
                     <span
-                      onClick={() => {
-                      }}
+                      onClick={() => handleDeletePost(post._id)}
                       className="font-medium text-red-500 hover:underline cursor-pointer"
                     >
                       Delete
@@ -85,6 +143,16 @@ const DashPosts = () => {
               </Table.Body>
             ))}
           </Table>
+          {showMore && (
+            <div className="flex flex-col items-center mt-7">
+              <button
+                onClick={handleShowMore}
+                className="underline hover:text-teal-300 text-teal-500 text-md"
+              >
+                Show more
+              </button>
+            </div>
+          )}
         </>
       ) : (
         <p>You have no posts yet :(</p>
