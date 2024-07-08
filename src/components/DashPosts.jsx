@@ -1,3 +1,4 @@
+import { deleteObject, getDownloadURL, getStorage, ref } from "firebase/storage";
 import { Table } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -28,7 +29,7 @@ const DashPosts = () => {
     if (currentUser.isAdmin) {
       fetchPosts();
     }
-  }, [currentUser._id]);
+  }, [currentUser._id, currentUser.isAdmin]);
 
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
@@ -46,7 +47,44 @@ const DashPosts = () => {
     }
   };
 
-  const handleDeletePost = async (postId) => {
+
+
+  const deleteImage = (imageUrl) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const storage = getStorage();
+        const imageRef = ref(storage, imageUrl);
+
+        getDownloadURL(imageRef)
+          .then(() => {
+            return deleteObject(imageRef);
+          })
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            if (error.code === "storage/object-not-found") {
+              console.log("Image not found");
+              resolve();
+            } else {
+              console.log("inside else: ", error);
+              reject(error);
+            }
+          });
+      } catch (error) {
+        console.log(error.code);
+        if (error.code === "storage/invalid-url") {
+          console.log("Image not found");
+          resolve();
+        }
+        reject(error);
+      }
+    });
+  };
+
+
+
+  const handleDeletePost = async (post) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -58,8 +96,9 @@ const DashPosts = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          await deleteImage(post.image);
           const res = await fetch(
-            `/api/post/deletepost/${postId}/${currentUser._id}`,
+            `/api/post/deletepost/${post._id}/${currentUser._id}`,
             {
               method: 'DELETE',
             }
@@ -69,7 +108,7 @@ const DashPosts = () => {
             console.log(data.message);
           } else {
             setUserPosts((prev) =>
-              prev.filter((post) => post._id !== postId)
+              prev.filter((p) => p._id !== post._id)
             );
             Swal.fire({
               title: "Deleted!",
@@ -125,7 +164,7 @@ const DashPosts = () => {
                   <Table.Cell>{post.category}</Table.Cell>
                   <Table.Cell>
                     <span
-                      onClick={() => handleDeletePost(post._id)}
+                      onClick={() => handleDeletePost(post)}
                       className="font-medium text-red-500 hover:underline cursor-pointer"
                     >
                       Delete
