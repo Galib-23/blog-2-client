@@ -1,6 +1,6 @@
 import { Sidebar } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { HiArrowSmRight, HiDocument, HiUser } from "react-icons/hi";
+import { HiArrowSmRight, HiOutlineDocumentText, HiUser } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
@@ -38,7 +38,7 @@ const DashSidebar = () => {
               <Sidebar.Item
                 active={tab === "posts"}
                 className="cursor-pointer mt-2"
-                icon={HiDocument}
+                icon={HiOutlineDocumentText}
                 label={"Posts"}
                 as="div"
               >
