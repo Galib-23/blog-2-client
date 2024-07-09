@@ -18,7 +18,7 @@ const FooterCom = () => {
               </span>{" "}
               Blog
             </Link>
-            <img className="w-24 h-24 sm:w-44 sm:h-44 rounded-xl" src={myPhoto} alt="" />
+            <img className="w-24 h-24 rounded-xl" src={myPhoto} alt="" />
           </div>
           <div className="grid grid-cols-2 gap-3 mt-8 sm:grid-cols-3 sm:gap-6">
             <div>
