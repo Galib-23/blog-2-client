@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Comment from "./Comment";
+import Swal from "sweetalert2";
 
 const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector((state) => state.user);
@@ -57,17 +58,14 @@ const CommentSection = ({ postId }) => {
     }
   };
 
-
-
-  
   const handleLike = async (commentId) => {
     try {
       if (!currentUser) {
-        navigate('/sign-in');
+        navigate("/sign-in");
         return;
       }
       const res = await fetch(`/api/comment/likeComment/${commentId}`, {
-        method: 'PUT',
+        method: "PUT",
       });
       if (res.ok) {
         const data = await res.json();
@@ -79,8 +77,8 @@ const CommentSection = ({ postId }) => {
                   likes: data.likes,
                   numberOfLikes: data.likes.length,
                 }
-              : comment
-          )
+              : comment,
+          ),
         );
       }
     } catch (error) {
@@ -88,6 +86,48 @@ const CommentSection = ({ postId }) => {
     }
   };
 
+  const handleDelete = async (commentId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          if (!currentUser) {
+            navigate("/sign-in");
+            return;
+          }
+          const res = await fetch(`/api/comment/deleteComment/${commentId}`, {
+            method: "DELETE",
+          });
+          const data = await res.json();
+          if (res.ok) {
+            setComments(
+              comments.filter((comment) => comment._id !== commentId),
+            );
+            Swal.fire({
+              title: "Deleted!",
+              text: "Comment has been deleted.",
+              icon: "success"
+            });
+          } else {
+            Swal.fire({
+              title: "Error!",
+              text: data.message,
+              icon: "error",
+            });
+          }
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
+    });
+  };
 
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
@@ -130,7 +170,10 @@ const CommentSection = ({ postId }) => {
             <p className="text-gray-500 text-xs">
               {200 - comment.length} characters remaining
             </p>
-            <button className="bg-cyan-600 p-2 rounded-md hover:bg-cyan-500 text-white hover:shadow-lg" type="submit">
+            <button
+              className="bg-cyan-600 p-2 rounded-md hover:bg-cyan-500 text-white hover:shadow-lg"
+              type="submit"
+            >
               Comment
             </button>
           </div>
@@ -142,12 +185,12 @@ const CommentSection = ({ postId }) => {
         </form>
       )}
       {comments.length === 0 ? (
-        <p className='text-sm my-5'>No comments yet!</p>
+        <p className="text-sm my-5">No comments yet!</p>
       ) : (
         <>
-          <div className='text-sm my-5 flex items-center gap-1'>
+          <div className="text-sm my-5 flex items-center gap-1">
             <p>Comments</p>
-            <div className='border border-gray-400 py-1 px-2 rounded-sm'>
+            <div className="border border-gray-400 py-1 px-2 rounded-sm">
               <p>{comments.length}</p>
             </div>
           </div>
@@ -156,6 +199,7 @@ const CommentSection = ({ postId }) => {
               key={comment._id}
               comment={comment}
               likeComment={handleLike}
+              deleteComment={handleDelete}
             />
           ))}
         </>
