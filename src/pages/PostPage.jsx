@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CallToAction from "../components/CallToAction";
 import CommentSection from "../components/CommentSection";
+import PostCard from "../components/PostCard";
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -56,6 +57,12 @@ export default function PostPage() {
         <Spinner size="xl" />
       </div>
     );
+  else if (error)
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <h2>Error Loading Post</h2>
+      </div>
+    );
   return (
     <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
@@ -84,10 +91,17 @@ export default function PostPage() {
         className="p-3 max-w-2xl mx-auto w-full post-content"
         dangerouslySetInnerHTML={{ __html: post && post.content }}
       ></div>
-      <div className='max-w-4xl mx-auto w-full'>
+      <div className="max-w-4xl mx-auto w-full">
         <CallToAction />
       </div>
       <CommentSection postId={post._id} />
+      <div className="flex flex-col justify-center items-center mb-5">
+        <h1 className="text-xl mt-5">Recent articles</h1>
+        <div className="flex flex-wrap gap-5 mt-5 justify-center">
+          {recentPosts &&
+            recentPosts.map((post) => <PostCard  key={post._id} post={post} />)}
+        </div>
+      </div>
     </main>
   );
 }
