@@ -1,7 +1,7 @@
 import { Sidebar } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { HiArrowSmRight, HiOutlineDocumentText, HiUser, HiUsers } from "react-icons/hi";
-import { FaComments } from "react-icons/fa";
+import { FaCcDiscover, FaComments } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
@@ -70,6 +70,19 @@ const DashSidebar = () => {
                 as="div"
               >
                 Comments
+              </Sidebar.Item>
+            </Link>
+          )}
+          {currentUser.isAdmin && (
+            <Link to="/dashboard?tab=dash">
+              <Sidebar.Item
+                active={tab === "dash"}
+                className="cursor-pointer mt-2"
+                icon={FaCcDiscover}
+                label={"Dash"}
+                as="div"
+              >
+                Dashboard
               </Sidebar.Item>
             </Link>
           )}
