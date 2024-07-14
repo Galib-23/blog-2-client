@@ -47,7 +47,7 @@ const Header = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await fetch("/api/user/signout", {
+          const res = await fetch("https://blog-2-server.vercel.app/api/user/signout", {
             method: "POST",
           });
           const data = await res.json();

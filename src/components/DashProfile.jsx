@@ -69,7 +69,7 @@ const DashProfile = () => {
 
       const updatedData = { ...formData, profilePicture: imageUrl };
 
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+      const res = await fetch(`https://blog-2-server.vercel.app/api/user/update/${currentUser._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
@@ -191,7 +191,7 @@ const DashProfile = () => {
             await deleteImage(currentUser.profilePicture);
           }
           console.log("after call");
-          const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+          const res = await fetch(`https://blog-2-server.vercel.app/api/user/delete/${currentUser._id}`, {
             method: "DELETE",
           });
           const data = await res.json();
@@ -234,7 +234,7 @@ const DashProfile = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await fetch("/api/user/signout", {
+          const res = await fetch("https://blog-2-server.vercel.app/api/user/signout", {
             method: "POST",
           });
           const data = await res.json();
