@@ -72,6 +72,7 @@ const DashProfile = () => {
       const res = await fetch(`https://blog-2-server.vercel.app/api/user/update/${currentUser._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify(updatedData),
       });
       const data = await res.json();
@@ -193,6 +194,7 @@ const DashProfile = () => {
           console.log("after call");
           const res = await fetch(`https://blog-2-server.vercel.app/api/user/delete/${currentUser._id}`, {
             method: "DELETE",
+            credentials: 'include',
           });
           const data = await res.json();
           if (!res.ok) {
@@ -236,6 +238,7 @@ const DashProfile = () => {
         try {
           const res = await fetch("https://blog-2-server.vercel.app/api/user/signout", {
             method: "POST",
+            credentials: 'include',
           });
           const data = await res.json();
           if (!res.ok) {

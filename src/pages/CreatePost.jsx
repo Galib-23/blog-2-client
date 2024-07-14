@@ -110,6 +110,7 @@ const CreatePost = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(updatedData),
       });
       const data = await res.json();

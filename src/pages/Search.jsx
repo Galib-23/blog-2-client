@@ -35,7 +35,13 @@ const Search = () => {
     const fetchPosts = async () => {
       setLoading(true);
       const searchQuery = urlParams.toString();
-      const res = await fetch(`https://blog-2-server.vercel.app/api/post/getposts?${searchQuery}`);
+      const res = await fetch(
+        `https://blog-2-server.vercel.app/api/post/getposts?${searchQuery}`,
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
       if (!res.ok) {
         setLoading(false);
         return;
@@ -82,9 +88,15 @@ const Search = () => {
     const numberOfPosts = posts.length;
     const startIndex = numberOfPosts;
     const urlParams = new URLSearchParams(location.search);
-    urlParams.set('startIndex', startIndex);
+    urlParams.set("startIndex", startIndex);
     const searchQuery = urlParams.toString();
-    const res = await fetch(`https://blog-2-server.vercel.app/api/post/getposts?${searchQuery}`);
+    const res = await fetch(
+      `https://blog-2-server.vercel.app/api/post/getposts?${searchQuery}`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
     if (!res.ok) {
       return;
     }

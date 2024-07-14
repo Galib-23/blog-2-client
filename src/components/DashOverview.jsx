@@ -24,7 +24,10 @@ const DashOverview = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch("https://blog-2-server.vercel.app/api/user/getusers?limit=5");
+        const res = await fetch("https://blog-2-server.vercel.app/api/user/getusers?limit=5", {
+          method: 'GET',
+          credentials: 'include',
+        });
         const data = await res.json();
         if (res.ok) {
           setUsers(data.users);
@@ -37,7 +40,10 @@ const DashOverview = () => {
     };
     const fetchPosts = async () => {
       try {
-        const res = await fetch("https://blog-2-server.vercel.app/api/post/getposts?limit=5");
+        const res = await fetch("https://blog-2-server.vercel.app/api/post/getposts?limit=5", {
+          method: 'GET',
+          credentials: 'include',
+        });
         const data = await res.json();
         if (res.ok) {
           setPosts(data.posts);
@@ -50,7 +56,10 @@ const DashOverview = () => {
     };
     const fetchComments = async () => {
       try {
-        const res = await fetch("https://blog-2-server.vercel.app/api/comment/getcomments?limit=5");
+        const res = await fetch("https://blog-2-server.vercel.app/api/comment/getcomments?limit=5", {
+          method: 'GET',
+          credentials: 'include',
+        });
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);

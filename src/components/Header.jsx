@@ -49,6 +49,7 @@ const Header = () => {
         try {
           const res = await fetch("https://blog-2-server.vercel.app/api/user/signout", {
             method: "POST",
+            credentials: 'include',
           });
           const data = await res.json();
           if (!res.ok) {

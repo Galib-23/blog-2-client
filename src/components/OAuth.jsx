@@ -20,6 +20,7 @@ const OAuth = () => {
             const res = await fetch('https://blog-2-server.vercel.app/api/auth/google', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
+                credentials: 'include',
                 body: JSON.stringify({
                     name: resultFromGoogle.user.displayName,
                     email: resultFromGoogle.user.email,

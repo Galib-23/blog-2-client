@@ -14,7 +14,10 @@ const DashPosts = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch(`https://blog-2-server.vercel.app/api/post/getposts?userId=${currentUser._id}`);
+        const res = await fetch(`https://blog-2-server.vercel.app/api/post/getposts?userId=${currentUser._id}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
         const data = await res.json();
         if (res.ok) {
           setUserPosts(data.posts);
@@ -35,7 +38,10 @@ const DashPosts = () => {
     const startIndex = userPosts.length;
     try {
       const res = await fetch(
-        `https://blog-2-server.vercel.app/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`,
+        `https://blog-2-server.vercel.app/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`, {
+          method: 'GET',
+          credentials: 'include',
+        }
       );
       const data = await res.json();
       setUserPosts((prev) => [...prev, ...data.posts]);
@@ -101,6 +107,7 @@ const DashPosts = () => {
             `https://blog-2-server.vercel.app/api/post/deletepost/${post._id}/${currentUser._id}`,
             {
               method: 'DELETE',
+              credentials: 'include',
             }
           );
           const data = await res.json();

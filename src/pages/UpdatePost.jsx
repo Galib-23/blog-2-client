@@ -30,7 +30,10 @@ const UpdatePost = () => {
   useEffect(() => {
     try {
       const fetchPost = async () => {
-        const res = await fetch(`https://blog-2-server.vercel.app/api/post/getposts?postId=${postId}`);
+        const res = await fetch(`https://blog-2-server.vercel.app/api/post/getposts?postId=${postId}`, {
+          method: "GET",
+          credentials: 'include',
+        });
         const data = await res.json();
         if (!res.ok) {
           console.log(data.message);
@@ -142,6 +145,7 @@ const UpdatePost = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(updatedData),
       });
       const data = await res.json();

@@ -17,7 +17,10 @@ const CommentSection = ({ postId }) => {
   useEffect(() => {
     const getComments = async () => {
       try {
-        const res = await fetch(`https://blog-2-server.vercel.app/api/comment/getPostComments/${postId}`);
+        const res = await fetch(`https://blog-2-server.vercel.app/api/comment/getPostComments/${postId}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
         if (res.ok) {
           const data = await res.json();
           setComments(data);
@@ -41,6 +44,7 @@ const CommentSection = ({ postId }) => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify({
           content: comment,
           postId,
@@ -66,6 +70,7 @@ const CommentSection = ({ postId }) => {
       }
       const res = await fetch(`https://blog-2-server.vercel.app/api/comment/likeComment/${commentId}`, {
         method: "PUT",
+        credentials: 'include',
       });
       if (res.ok) {
         const data = await res.json();
@@ -104,6 +109,7 @@ const CommentSection = ({ postId }) => {
           }
           const res = await fetch(`https://blog-2-server.vercel.app/api/comment/deleteComment/${commentId}`, {
             method: "DELETE",
+            credentials: 'include',
           });
           const data = await res.json();
           if (res.ok) {
