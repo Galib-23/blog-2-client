@@ -14,7 +14,7 @@ const DashComments = () => {
     const fetchComments = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`https://blog-2-server.vercel.app/api/comment/getcomments`);
+        const res = await fetch(`/api/comment/getcomments`);
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);
@@ -58,7 +58,7 @@ const DashComments = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            const res = await fetch(`https://blog-2-server.vercel.app/api/comment/deleteComment/${commentId}`, {
+            const res = await fetch(`/api/comment/deleteComment/${commentId}`, {
               method: "DELETE",
             });
             const data = await res.json();

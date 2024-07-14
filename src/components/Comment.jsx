@@ -10,7 +10,7 @@ const Comment = ({ comment, likeComment, deleteComment }) => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await fetch(`https://blog-2-server.vercel.app/api/user/${comment.userId}`);
+        const res = await fetch(`/api/user/${comment.userId}`);
         const data = await res.json();
         if (res.ok) {
           setUser(data);

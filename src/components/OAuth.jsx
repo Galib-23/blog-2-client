@@ -17,7 +17,7 @@ const OAuth = () => {
         try {
             dispatch(SignInStart());
             const resultFromGoogle = await signInWithPopup(auth, provider);
-            const res = await fetch('https://blog-2-server.vercel.app/api/auth/google', {
+            const res = await fetch('/api/auth/google', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({

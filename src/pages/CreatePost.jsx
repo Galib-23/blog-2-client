@@ -105,7 +105,7 @@ const CreatePost = () => {
       }
       const updatedData = { ...formData, image: imageUrl };
 
-      const res = await fetch("https://blog-2-server.vercel.app/api/post/create", {
+      const res = await fetch("/api/post/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
