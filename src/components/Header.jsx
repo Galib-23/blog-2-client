@@ -18,17 +18,16 @@ const Header = () => {
   const { theme } = useSelector((state) => state.theme);
   const [isSpinning, setIsSpinning] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  console.log(searchTerm)
+  console.log(searchTerm);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    const searchTermFromUrl = urlParams.get('searchTerm');
+    const searchTermFromUrl = urlParams.get("searchTerm");
 
     if (searchTermFromUrl) {
       setSearchTerm(searchTermFromUrl);
     }
-
-  }, [location.search])
+  }, [location.search]);
 
   const handleClick = () => {
     setIsSpinning(true);
@@ -77,10 +76,10 @@ const Header = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const urlParams = new URLSearchParams(location.search);
-    urlParams.set('searchTerm', searchTerm);
+    urlParams.set("searchTerm", searchTerm);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
-  }
+  };
 
   return (
     <Navbar className="border-b-2">
@@ -102,9 +101,11 @@ const Header = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </form>
-      <Button className="w-12 h-10 lg:hidden" color="gray" pill>
-        <AiOutlineSearch />
-      </Button>
+      <Link to={`/search`} className="w-12 h-10 lg:hidden">
+        <Button className="w-12 h-10 lg:hidden" color="gray" pill>
+          <AiOutlineSearch />
+        </Button>
+      </Link>
       <div className="flex items-center gap-2 md:order-2">
         <button
           onClick={handleClick}
@@ -153,15 +154,26 @@ const Header = () => {
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link active={path === "/"} as={"div"}>
-          <Link to="/">Home</Link>
-        </Navbar.Link>
-        <Navbar.Link active={path === "/about"} as={"div"}>
-          <Link to="/about">About</Link>
-        </Navbar.Link>
-        <Navbar.Link active={path === "/projects"} as={"div"}>
-          <Link to="/projects">Projects</Link>
-        </Navbar.Link>
+        <Link to={"/"}>
+          <Navbar.Link active={path === "/"} as={"div"}>
+            Home
+          </Navbar.Link>
+        </Link>
+        <Link to={"/search"}>
+          <Navbar.Link active={path === "/search"} as={"div"}>
+            All Posts
+          </Navbar.Link>
+        </Link>
+        <Link to="/about">
+          <Navbar.Link active={path === "/about"} as={"div"}>
+            About
+          </Navbar.Link>
+        </Link>
+        <Link to="/projects">
+          <Navbar.Link active={path === "/projects"} as={"div"}>
+            Projects
+          </Navbar.Link>
+        </Link>
       </Navbar.Collapse>
     </Navbar>
   );
