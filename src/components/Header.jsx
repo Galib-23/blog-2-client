@@ -85,13 +85,8 @@ const Header = () => {
     <Navbar className="border-b-2">
       <Link
         to={"/"}
-        className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white"
-      >
-        <span className="px-2 py-1 bg-gradient-to-r from-purple-400 to-blue-500 rounded-lg text-white">
-          Galib&apos;s{" "}
-        </span>{" "}
-        Blog
-      </Link>
+        className="self-center whitespace-nowrap text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-lg shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 font-medium rounded-lg text-md px-5 py-2.5 text-center me-2 mb-2"
+      >Blog-23</Link>
       <form onSubmit={handleSubmit}>
         <TextInput
           type="text"
@@ -103,7 +98,7 @@ const Header = () => {
       </form>
       <Link to={`/search`} className="w-12 h-10 lg:hidden">
         <Button className="w-12 h-10 lg:hidden" color="gray" pill>
-          <AiOutlineSearch />
+          <AiOutlineSearch /> 
         </Button>
       </Link>
       <div className="flex items-center gap-2 md:order-2">

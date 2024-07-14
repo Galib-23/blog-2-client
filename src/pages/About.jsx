@@ -9,10 +9,7 @@ const About = () => {
             </h1>
             <div className="text-md text-gray-500 flex flex-col gap-6">
               <p>
-                Welcome to Galib&apos;s Blog! This blog was created by Sahand
-                Ghavidel as a personal project to share his thoughts and ideas
-                with the world. Sahand is a passionate developer who loves to
-                write about technology, coding, and everything in between.
+              Welcome to my blog! I&apos;m Galib, a passionate MERN stack developer and backend enthusiast with a strong foundation in SQL, Postgres, MongoDB, GraphQL, Prisma, and more. With years of experience navigating the intricate world of web development, I&apos;ve honed my skills in creating robust, scalable, and efficient applications. This blog is my digital space to share insights, tutorials, and best practices on these cutting-edge technologies. Whether you&apos;re a beginner looking to break into the tech world or an experienced developer aiming to expand your knowledge, you&apos;ll find valuable content here. My goal is to make complex concepts more accessible and to inspire others to push the boundaries of what&apos;s possible in web development. Join me on this journey as we explore the exciting landscape of backend development and beyond!
               </p>
 
               <p>

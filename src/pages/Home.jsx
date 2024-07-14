@@ -26,7 +26,7 @@ const Home = () => {
         </p>
         <Link
           to='/search'
-          className='text-xs sm:text-sm text-teal-500 font-bold hover:underline'
+          className='text-xs sm:text-base text-cyan-500 font-bold underline'
         >
           View all posts
         </Link>
@@ -46,7 +46,7 @@ const Home = () => {
             </div>
             <Link
               to={'/search'}
-              className='text-lg text-teal-500 hover:underline text-center'
+              className='text-lg text-cyan-400 hover:underline text-center'
             >
               View all posts
             </Link>
