@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
+      'https://blog-2-server.vercel.app/api': {
         target: 'https://blog-2-server.vercel.app',
         changeOrigin: true,
         secure: true,
