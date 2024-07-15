@@ -43,7 +43,7 @@ const DashComments = () => {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center">
+      <div className="flex flex-col w-full justify-center items-center">
         <Spinner size="xl" />
       </div>
     );

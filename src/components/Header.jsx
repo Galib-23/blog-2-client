@@ -97,15 +97,15 @@ const Header = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </form>
-      <Link to={`/search`} className="w-12 h-10 lg:hidden">
-        <Button className="w-12 h-10 lg:hidden" color="gray" pill>
+      <Link to={`/search`} className="w-10 h-10 lg:hidden">
+        <Button className="w-10 h-10 lg:hidden flex items-center justify-center" color="gray" pill>
           <AiOutlineSearch /> 
         </Button>
       </Link>
-      <div className="flex items-center gap-2 md:order-2">
+      <div className="flex items-center gap-4 md:order-2">
         <button
           onClick={handleClick}
-          className={`w-9 h-9 rounded-full hidden sm:flex sm:justify-center sm:items-center border hover:shadow-lg hover:scale-105 transition-scale duration-300 ${
+          className={`w-9 h-9 rounded-full flex items-center justify-center sm:justify-center sm:items-center border hover:shadow-lg hover:scale-105 transition-scale duration-300 ${
             theme === "dark" && "hover:shadow-slate-500 hover:shadow-2xl"
           }`}
         >

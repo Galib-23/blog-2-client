@@ -1,4 +1,4 @@
-import { Table } from "flowbite-react";
+import { Spinner, Table } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { FaCheck, FaTimes } from "react-icons/fa";
@@ -14,23 +14,30 @@ export default function DashUsers() {
   const { currentUser } = useSelector((state) => state.user);
   const [users, setUsers] = useState([]);
   const [showMore, setShowMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(`https://blog-2-server.vercel.app/api/user/getusers`, {
-          method: 'GET',
-          credentials: 'include',
-        });
+        setLoading(true);
+        const res = await fetch(
+          `https://blog-2-server.vercel.app/api/user/getusers`,
+          {
+            method: "GET",
+            credentials: "include",
+          },
+        );
         const data = await res.json();
         if (res.ok) {
           setUsers(data.users);
+          setLoading(false);
           if (data.users.length < 9) {
             setShowMore(false);
           }
         }
       } catch (error) {
         console.log(error.message);
+        setLoading(false);
       }
     };
     if (currentUser.isAdmin) {
@@ -41,19 +48,25 @@ export default function DashUsers() {
   const handleShowMore = async () => {
     const startIndex = users.length;
     try {
-      const res = await fetch(`https://blog-2-server.vercel.app/api/user/getusers?startIndex=${startIndex}`, {
-        method: 'GET',
-        credentials: 'include',
-      });
+      setLoading(true);
+      const res = await fetch(
+        `https://blog-2-server.vercel.app/api/user/getusers?startIndex=${startIndex}`,
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
       const data = await res.json();
       if (res.ok) {
         setUsers((prev) => [...prev, ...data.users]);
+        setLoading(false);
         if (data.users.length < 9) {
           setShowMore(false);
         }
       }
     } catch (error) {
       console.log(error.message);
+      setLoading(false);
     }
   };
 
@@ -105,10 +118,13 @@ export default function DashUsers() {
           if (user.profilePicture) {
             await deleteImage(user.profilePicture);
           }
-          const res = await fetch(`https://blog-2-server.vercel.app/api/user/delete/${user._id}`, {
-            method: "DELETE",
-            credentials: 'include',
-          });
+          const res = await fetch(
+            `https://blog-2-server.vercel.app/api/user/delete/${user._id}`,
+            {
+              method: "DELETE",
+              credentials: "include",
+            },
+          );
           const data = await res.json();
           if (res.ok) {
             setUsers((prev) => prev.filter((u) => u._id !== user._id));
@@ -119,10 +135,10 @@ export default function DashUsers() {
             });
           } else {
             Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: data.message || "Something went wrong!",
-              });
+              icon: "error",
+              title: "Oops...",
+              text: data.message || "Something went wrong!",
+            });
             console.log(data.message);
           }
         } catch (error) {
@@ -131,6 +147,13 @@ export default function DashUsers() {
       }
     });
   };
+
+  if (loading)
+    return (
+      <div className="flex flex-col w-full justify-center items-center">
+        <Spinner size="xl" />
+      </div>
+    );
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">

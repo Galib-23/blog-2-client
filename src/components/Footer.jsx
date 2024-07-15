@@ -5,7 +5,7 @@ import { BsFacebook, BsGithub, BsInstagram } from "react-icons/bs";
 
 const FooterCom = () => {
   return (
-    <Footer container className="">
+    <Footer container className="bg-slate-200">
       <div className="w-full max-w-7xl mx-auto">
         <div className="grid w-full justify-between sm:flex md:grid-cols-1">
           <div className="flex flex-row sm:flex-col gap-8 md:gap-3">

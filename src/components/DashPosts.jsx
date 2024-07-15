@@ -1,5 +1,5 @@
 import { deleteObject, getDownloadURL, getStorage, ref } from "firebase/storage";
-import { Table } from "flowbite-react";
+import { Spinner, Table } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -10,22 +10,27 @@ const DashPosts = () => {
 
   const [userPosts, setUserPosts] = useState([]);
   const [showMore, setShowMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        setLoading(true);
         const res = await fetch(`https://blog-2-server.vercel.app/api/post/getposts?userId=${currentUser._id}`, {
           method: 'GET',
           credentials: 'include',
         });
         const data = await res.json();
         if (res.ok) {
+          setLoading(false);
           setUserPosts(data.posts);
           if (data?.post?.length < 9) {
             setShowMore(false);
           }
         }
       } catch (error) {
+        setLoading(false);
         console.log(error.message);
       }
     };
@@ -37,6 +42,7 @@ const DashPosts = () => {
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
     try {
+      setLoading(true);
       const res = await fetch(
         `https://blog-2-server.vercel.app/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`, {
           method: 'GET',
@@ -45,11 +51,13 @@ const DashPosts = () => {
       );
       const data = await res.json();
       setUserPosts((prev) => [...prev, ...data.posts]);
+      setLoading(false);
       if (data.posts.length < 9) {
         setShowMore(false);
       }
     } catch (error) {
       console.log(error.message);
+      setLoading(false);
     }
   };
 
@@ -129,6 +137,13 @@ const DashPosts = () => {
       }
     });
   };
+
+  if (loading)
+    return (
+      <div className="flex flex-col w-full justify-center items-center">
+        <Spinner size="xl" />
+      </div>
+    );
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
