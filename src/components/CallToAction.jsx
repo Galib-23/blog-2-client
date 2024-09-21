@@ -2,7 +2,7 @@ import gitProfile from "../assets/gitbg2.png";
 
 export default function CallToAction() {
   return (
-    <div className="flex flex-col sm:flex-row p-3 border border-teal-600 justify-center items-center rounded-tl-3xl rounded-br-3xl text-center">
+    <div className="flex flex-col sm:flex-row p-3 border border-teal-600 justify-between lg:gap-36 items-center rounded-tl-3xl rounded-br-3xl text-center">
       <div className="flex-1 justify-center flex flex-col">
         <h2 className="text-2xl">Want to stay updated about Development?</h2>
         <p className="text-gray-500 my-2">
@@ -17,8 +17,8 @@ export default function CallToAction() {
           Visit Now
         </a>
       </div>
-      <div className="p-7 flex-1">
-        <img className=" rounded-tl-xl rounded-br-xl" src={gitProfile} />
+      <div className="p-7">
+        <img className=" rounded-tl-xl rounded-br-xl w-[400px]" src={gitProfile} />
       </div>
     </div>
   );

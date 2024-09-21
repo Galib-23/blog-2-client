@@ -1,4 +1,4 @@
-import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
+import { Button, Dropdown, Navbar, TextInput } from "flowbite-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSignOutAlt, FaSun } from "react-icons/fa";
@@ -47,10 +47,13 @@ const Header = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await fetch("https://blog-2-server.vercel.app/api/user/signout", {
-            method: "POST",
-            credentials: 'include',
-          });
+          const res = await fetch(
+            "https://blog-2-server.vercel.app/api/user/signout",
+            {
+              method: "POST",
+              credentials: "include",
+            },
+          );
           const data = await res.json();
           if (!res.ok) {
             console.log(data.message);
@@ -87,7 +90,9 @@ const Header = () => {
       <Link
         to={"/"}
         className="self-center whitespace-nowrap text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-lg shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 font-medium rounded-lg text-md px-5 py-2.5 text-center me-2 mb-2"
-      >Blog-23</Link>
+      >
+        Blog-23
+      </Link>
       <form onSubmit={handleSubmit}>
         <TextInput
           type="text"
@@ -97,12 +102,16 @@ const Header = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </form>
-      <Link to={`/search`} className="w-10 h-10 lg:hidden">
-        <Button className="w-10 h-10 lg:hidden flex items-center justify-center" color="gray" pill>
-          <AiOutlineSearch /> 
+      <Link to={`/search`} className="w-9 h-9 rounded-full lg:hidden">
+        <Button
+          className=""
+          color="gray"
+          pill
+        >
+          <AiOutlineSearch />
         </Button>
       </Link>
-      <div className="flex items-center gap-4 md:order-2">
+      <div className="flex items-center gap-2 md:order-2">
         <button
           onClick={handleClick}
           className={`w-9 h-9 rounded-full flex items-center justify-center sm:justify-center sm:items-center border hover:shadow-lg hover:scale-105 transition-scale duration-300 ${
@@ -117,10 +126,15 @@ const Header = () => {
         </button>
         {currentUser ? (
           <Dropdown
+            className=""
             arrowIcon={false}
             inline
             label={
-              <Avatar alt="User" img={currentUser.profilePicture} rounded />
+              <img
+                alt="User"
+                className="h-9 w-9 rounded-full object-contain"
+                src={currentUser.profilePicture}
+              />
             }
           >
             <Dropdown.Header>
